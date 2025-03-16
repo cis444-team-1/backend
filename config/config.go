@@ -10,13 +10,22 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	"github.com/nedpals/supabase-go"
 )
 
 type Config struct {
-	DBConnectionUrl  string
-	JWTAccessSecret  string
-	JWTRefreshSecret string
-	FrontendOrigin   string
+	DBConnectionUrl     string
+	JWTAccessSecret     string
+	JWTRefreshSecret    string
+	FrontendOrigin      string
+	S3BucketName        string
+	AWSRegion           string
+	AWSAccessKey        string
+	AWSSecretAccessKey  string
+	AWSCloudfrontDomain string
+	SupabaseAnonKey     string
+	SupabaseUrl         string
+	SupabaseClient      *supabase.Client
 }
 
 var (
@@ -62,11 +71,21 @@ func LoadConfig() *Config {
 		}
 
 		config = &Config{
-			DBConnectionUrl:  getEnv("DATABASE_URL"),
-			JWTAccessSecret:  getEnv("JWT_ACCESS_SECRET"),
-			JWTRefreshSecret: getEnv("JWT_REFRESH_SECRET"),
-			FrontendOrigin:   getEnv("FRONTEND_ORIGIN", "http://localhost:5173"),
+			DBConnectionUrl:     getEnv("DATABASE_URL"),
+			JWTAccessSecret:     getEnv("JWT_ACCESS_SECRET"),
+			JWTRefreshSecret:    getEnv("JWT_REFRESH_SECRET"),
+			FrontendOrigin:      getEnv("FRONTEND_ORIGIN", "http://localhost:5173"),
+			S3BucketName:        getEnv("S3_BUCKET_NAME"),
+			AWSRegion:           getEnv("AWS_REGION"),
+			AWSAccessKey:        getEnv("AWS_ACCESS_KEY"),
+			AWSSecretAccessKey:  getEnv("AWS_SECRET_ACCESS_KEY"),
+			AWSCloudfrontDomain: getEnv("AWS_CLOUDFRONT_DOMAIN"),
+			SupabaseUrl:         getEnv("SUPABASE_URL"),
+			SupabaseAnonKey:     getEnv("SUPABASE_ANON_KEY"),
 		}
+
+		// Initialize Supabase client
+		config.SupabaseClient = supabase.CreateClient(config.SupabaseUrl, config.SupabaseAnonKey)
 	})
 	return config
 }
