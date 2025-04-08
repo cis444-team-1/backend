@@ -12,6 +12,7 @@ type Playlist struct {
 	Title       string    `json:"title"`
 	Description string    `json:"description"`
 	IsPublic    bool      `json:"is_public"`
+	ImageSrc    string    `json:"image_src"`
 	CreatedAt   time.Time `json:"created_at"`
 }
 

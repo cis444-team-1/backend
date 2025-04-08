@@ -9,7 +9,7 @@ import (
 )
 
 func InitRoutes(e *echo.Echo, h *handlers.Handler) {
-	// e.POST("/generate-presigned-url", h.GeneratePresignedFileURL, auth.AuthMiddleware)
+	e.POST("/generate-presigned-url", h.GeneratePresignedFileURL, auth.AuthMiddleware)
 	e.GET("/test", func(c echo.Context) error {
 		return c.JSON(http.StatusOK, map[string]string{
 			"message": "Hello, World!",
