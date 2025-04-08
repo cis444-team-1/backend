@@ -6,6 +6,7 @@ import (
 	"github.com/google/uuid"
 )
 
+// NOT USED AT THE MOMENT
 type Recommendation struct {
 	RecommendationId uuid.UUID `json:"recommendation_id"`
 	UserId           uuid.UUID `json:"user_id"`
