@@ -16,7 +16,6 @@ type Track struct {
 	UploadedId      uuid.UUID `json:"uploaded_id"`
 	AlbumTitle      string    `json:"album_title"`
 	Description     string    `json:"description"`
-	Lyrics          string    `json:"lyrics"`
 	DurationSeconds int       `json:"duration_seconds"`
 }
 
@@ -27,10 +26,9 @@ type GetTrackResponse struct {
 	AudioSrc        string    `json:"audio_src"`
 	CreatedAt       time.Time `json:"created_at"`
 	UpdatedAt       time.Time `json:"updated_at"`
-	UploadedId      uuid.UUID `json:"uploaded_id"`
+	ArtistName      string    `json:"artist_name"`
 	AlbumTitle      string    `json:"album_title"`
 	Description     string    `json:"description"`
-	Lyrics          string    `json:"lyrics"`
 	DurationSeconds int       `json:"duration_seconds"`
 }
 
@@ -40,7 +38,6 @@ type PostTrackRequest struct {
 	AudioSrc        string `json:"audio_src"`
 	AlbumTitle      string `json:"album_title"`
 	Description     string `json:"description"`
-	Lyrics          string `json:"lyrics"`
 	DurationSeconds int    `json:"duration_seconds"`
 	ArtistName      string `json:"artist_name"`
 }
@@ -52,11 +49,6 @@ type PutTrackRequest struct {
 	AudioSrc        *string   `json:"audio_src"`
 	AlbumTitle      *string   `json:"album_title"`
 	Description     *string   `json:"description"`
-	Lyrics          *string   `json:"lyrics"`
 	DurationSeconds *int      `json:"duration_seconds"`
 	ArtistName      *string   `json:"artist_name"`
-}
-
-type DeleteTrackRequest struct {
-	TrackId uuid.UUID `json:"track_id"`
 }

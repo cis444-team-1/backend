@@ -14,6 +14,7 @@ type Playlist struct {
 	IsPublic    bool      `json:"is_public"`
 	ImageSrc    string    `json:"image_src"`
 	CreatedAt   time.Time `json:"created_at"`
+	UpdatedAt   time.Time `json:"updated_at"`
 }
 
 type GetPlaylistResponse struct {
@@ -24,6 +25,7 @@ type GetPlaylistResponse struct {
 	IsPublic    bool      `json:"is_public"`
 	ImageSrc    string    `json:"image_src"`
 	CreatedAt   time.Time `json:"created_at"`
+	UpdatedAt   time.Time `json:"updated_at"`
 }
 
 type PostPlaylistRequest struct {
@@ -45,11 +47,14 @@ type DeletePlaylistRequest struct {
 	PlaylistId uuid.UUID `json:"playlist_id"`
 }
 
-type PlaylistTrack struct {
-	PlaylistId uuid.UUID `json:"playlist_id"`
-	TrackId    uuid.UUID `json:"track_id"`
-	Position   int       `json:"position"`
-	AddedAt    time.Time `json:"added_at"`
+type AddTrackToPlaylistRequest struct {
+	TrackId  uuid.UUID `json:"track_id"`
+	Position int       `json:"position"`
+	AddedAt  time.Time `json:"added_at"`
+}
+
+type RemoveTrackFromPlaylistRequest struct {
+	TrackId uuid.UUID `json:"track_id"`
 }
 
 type PlaylistUser struct {
