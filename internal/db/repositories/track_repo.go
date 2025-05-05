@@ -3,7 +3,6 @@ package repositories
 import (
 	"context"
 	"database/sql"
-	"fmt"
 	"time"
 
 	"github.com/cis444-team-1/backend/internal/models"
@@ -76,17 +75,15 @@ func (r *TrackRepository) GetTracksByUserID(userID string) ([]*models.Track, err
 }
 
 func (r *TrackRepository) GetTracksBySearchQuery(query string) ([]*models.GetTrackResponse, error) {
-	ctx := context.Background()
-	// Optional: prefix match each term
-	tsQuery := fmt.Sprintf("%s:*", query)
-
-	rows, err := r.db.QueryContext(ctx, `
+	searchQuery := `
         select track_id, title, image_src, audio_src, created_at, updated_at, artist_name, album_title, description, duration_seconds
         from tracks
         where search_vector @@ to_tsquery('english', $1)
         order by ts_rank(search_vector, to_tsquery('english', $1)) desc
         limit 50
-    `, tsQuery)
+	`
+
+	rows, err := r.db.Query(searchQuery, query)
 	if err != nil {
 		return nil, err
 	}

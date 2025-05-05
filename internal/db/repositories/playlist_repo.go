@@ -47,11 +47,6 @@ func (r *PlaylistRepository) GetPlaylistsByUserID(userID string, isPublic bool) 
 	return nil, nil
 }
 
-func (r *PlaylistRepository) GetPlaylistsBySearchQuery(query string) ([]models.GetPlaylistResponse, error) {
-	// TODO: implement
-	return nil, nil
-}
-
 func (r *PlaylistRepository) UpdatePlaylist(playlistID string, data map[string]interface{}) error {
 	// TODO: implement
 	return nil
@@ -230,4 +225,44 @@ func (r *PlaylistRepository) GetTracksByPlaylistID(playlistID string) ([]models.
 	}
 
 	return tracks, nil
+}
+
+func (r *PlaylistRepository) GetPlaylistsBySearchQuery(query string) ([]*models.GetPlaylistResponse, error) {
+	searchQuery := `
+        select playlist_id, user_id, title, description, is_public, image_src, created_at, updated_at
+        from playlists
+        where search_vector @@ to_tsquery('english', $1)
+        order by ts_rank(search_vector, to_tsquery('english', $1)) desc
+        limit 50
+	`
+
+	rows, err := r.db.Query(searchQuery, query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var playlists []*models.GetPlaylistResponse
+	for rows.Next() {
+		var playlist models.GetPlaylistResponse
+		err := rows.Scan(
+			&playlist.PlaylistId,
+			&playlist.UserId,
+			&playlist.Title,
+			&playlist.Description,
+			&playlist.IsPublic,
+			&playlist.ImageSrc,
+			&playlist.CreatedAt,
+			&playlist.UpdatedAt,
+		)
+		if err != nil {
+			return nil, err
+		}
+		playlists = append(playlists, &playlist)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return playlists, nil
 }

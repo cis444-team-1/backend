@@ -38,19 +38,6 @@ func InitRoutes(e *echo.Echo, h *handlers.Handler) {
 	e.DELETE("/playlists/:playlistId/tracks", h.RemoveTrackFromPlaylistHandler) // Remove song from playlist, Requires middleware
 	// e.GET("/playlists/new-releases", nil)                       // Get new releases, has query params for limit, max return is 20
 
-	// -- Following other users Handlers
-	// e.GET("/users/:userId/following", nil)   // Get users that user is following
-	// e.POST("/users/:userId/follow", nil)     // Follow a user, Requires middleware
-	// e.DELETE("/users/:userId/unfollow", nil) // Unfollow a user, Requires middleware
-
-	// -- Following other artists Handlers
-	// e.GET("/artists/:artistId/followers", nil)   // Get artists that user is following
-	// e.POST("/artists/:artistId/follow", nil)     // Follow an artist, Requires middleware
-	// e.DELETE("/artists/:artistId/unfollow", nil) // Unfollow an artist, Requires middleware
-
-	// -- Artist Handlers
-	// e.GET("/artists/:artistId", nil) // Get artist by id
-
 	// -- Search Handlers
-	//e.GET("/search", nil) // Has query param ?q=<query>&type=<type>
+	e.GET("/search", h.SearchHandler) // Has query param ?q=<query>&type=<type>
 }
