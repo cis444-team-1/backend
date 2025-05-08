@@ -42,9 +42,39 @@ func (r *PlaylistRepository) GetPlaylistByID(playlistID string) (*models.GetPlay
 	return playlist, err
 }
 
-func (r *PlaylistRepository) GetPlaylistsByUserID(userID string, isPublic bool) ([]string, error) {
-	// TODO: implement
-	return nil, nil
+func (r *PlaylistRepository) GetPlaylistsByUserID(userID string) ([]models.GetPlaylistResponse, error) {
+	query := `
+		SELECT playlist_id, user_id, title, description, is_public, image_src, created_at, updated_at
+		FROM playlists
+		WHERE user_id = $1;
+	`
+
+	rows, err := r.db.Query(query, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var playlists []models.GetPlaylistResponse
+	for rows.Next() {
+		var playlist models.GetPlaylistResponse
+		err := rows.Scan(
+			&playlist.PlaylistId,
+			&playlist.UserId,
+			&playlist.Title,
+			&playlist.Description,
+			&playlist.IsPublic,
+			&playlist.ImageSrc,
+			&playlist.CreatedAt,
+			&playlist.UpdatedAt,
+		)
+		if err != nil {
+			return nil, err
+		}
+		playlists = append(playlists, playlist)
+	}
+
+	return playlists, nil
 }
 
 func (r *PlaylistRepository) UpdatePlaylist(playlistID string, data map[string]interface{}) error {
@@ -74,9 +104,10 @@ func (r *PlaylistRepository) CreatePlaylist(uploadedByID string, playlist models
 			is_public,
 			image_src,
 			created_at,
-			updated_at
+			updated_at,
+			user_id
 		) VALUES (
-			$1, $2, $3, $4, $5, $6, $7 
+			$1, $2, $3, $4, $5, $6, $7, $8
 		);`
 
 	var playlistID = uuid.New()
@@ -90,6 +121,7 @@ func (r *PlaylistRepository) CreatePlaylist(uploadedByID string, playlist models
 		playlist.ImageSrc,
 		time.Now(),
 		time.Now(),
+		uploadedByID,
 	)
 
 	if err != nil {
@@ -264,5 +296,42 @@ func (r *PlaylistRepository) GetPlaylistsBySearchQuery(query string) ([]*models.
 	if err := rows.Err(); err != nil {
 		return nil, err
 	}
+	return playlists, nil
+}
+
+func (r *PlaylistRepository) GetNewReleasesPlaylists() ([]*models.GetPlaylistResponse, error) {
+	query := `
+		SELECT playlist_id, user_id, title, description, is_public, image_src, created_at, updated_at
+		FROM playlists
+		WHERE is_public = true
+		ORDER BY created_at DESC
+		LIMIT 20;
+	`
+
+	rows, err := r.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var playlists []*models.GetPlaylistResponse
+
+	for rows.Next() {
+		var playlist models.GetPlaylistResponse
+		if err := rows.Scan(
+			&playlist.PlaylistId,
+			&playlist.UserId,
+			&playlist.Title,
+			&playlist.Description,
+			&playlist.IsPublic,
+			&playlist.ImageSrc,
+			&playlist.CreatedAt,
+			&playlist.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		playlists = append(playlists, &playlist)
+	}
+
 	return playlists, nil
 }

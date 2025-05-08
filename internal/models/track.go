@@ -30,6 +30,22 @@ type GetTrackResponse struct {
 	AlbumTitle      string    `json:"album_title"`
 	Description     string    `json:"description"`
 	DurationSeconds int       `json:"duration_seconds"`
+	UploadedId      uuid.UUID `json:"uploaded_id"`
+}
+
+type GetTrackResponseWithPlayDate struct {
+	TrackId         uuid.UUID `json:"track_id"`
+	Title           string    `json:"title"`
+	ImageSrc        string    `json:"image_src"`
+	AudioSrc        string    `json:"audio_src"`
+	CreatedAt       time.Time `json:"created_at"`
+	UpdatedAt       time.Time `json:"updated_at"`
+	ArtistName      string    `json:"artist_name"`
+	AlbumTitle      string    `json:"album_title"`
+	Description     string    `json:"description"`
+	DurationSeconds int       `json:"duration_seconds"`
+	UploadedId      uuid.UUID `json:"uploaded_id"`
+	PlayedAt        time.Time `json:"played_at"`
 }
 
 type PostTrackRequest struct {
@@ -51,4 +67,9 @@ type PutTrackRequest struct {
 	Description     *string   `json:"description"`
 	DurationSeconds *int      `json:"duration_seconds"`
 	ArtistName      *string   `json:"artist_name"`
+}
+
+type TrendingTrack struct {
+	Track
+	PlayCount int `json:"play_count"`
 }

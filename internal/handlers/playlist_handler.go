@@ -8,7 +8,35 @@ import (
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 	"github.com/lib/pq"
+	"github.com/nedpals/supabase-go"
 )
+
+func (h *Handler) GetUsersPersonalPlaylistsHandler(c echo.Context) error {
+	user := c.Get("user")
+
+	if user == nil {
+		return c.JSON(http.StatusUnauthorized, "Unauthorized")
+	}
+
+	dbConn := h.DB.GetDB()
+	playlistRepo := repositories.NewPlaylistRepository(dbConn)
+	playlists, err := playlistRepo.GetPlaylistsByUserID(user.(*supabase.User).ID)
+
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+	}
+
+	return c.JSON(http.StatusOK, playlists)
+}
+
+// func (h *Handler) GetUsersFollowingPlaylistsHandler(c echo.Context) error {
+// 	user := c.Get("user")
+
+// 	if user == nil {
+// 		return c.JSON(http.StatusUnauthorized, "Unauthorized")
+// 	}
+
+// }
 
 func (h *Handler) GetPlaylistHandler(c echo.Context) error {
 	playlistId := c.Param("playlistId")
@@ -65,11 +93,11 @@ func (*Handler) UpdatePlaylistHandler(c echo.Context) error {
 }
 
 func (h *Handler) InsertPlaylistHandler(c echo.Context) error {
-	// user := c.Get("user")
+	user := c.Get("user")
 
-	// if (user == nil) {
-	// 	return c.JSON(http.StatusUnauthorized, "Unauthorized")
-	// }
+	if user == nil {
+		return c.JSON(http.StatusUnauthorized, "Unauthorized")
+	}
 
 	var playlist models.PostPlaylistRequest
 
@@ -81,7 +109,7 @@ func (h *Handler) InsertPlaylistHandler(c echo.Context) error {
 	dbConn := h.DB.GetDB()
 	playlistRepo := repositories.NewPlaylistRepository(dbConn)
 
-	playlistID, err := playlistRepo.CreatePlaylist(uuid.New().String(), playlist)
+	playlistID, err := playlistRepo.CreatePlaylist(user.(*supabase.User).ID, playlist)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"errors": err.Error()})
 	}
@@ -174,6 +202,18 @@ func (h *Handler) GetTracksFromPlaylistHandler(c echo.Context) error {
 	playlistRepo := repositories.NewPlaylistRepository(dbConn)
 
 	tracks, err := playlistRepo.GetTracksByPlaylistID(playlistUUID.String())
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"errors": err.Error()})
+	}
+
+	return c.JSON(http.StatusOK, tracks)
+}
+
+func (h *Handler) GetNewReleasesHandler(c echo.Context) error {
+	dbConn := h.DB.GetDB()
+	playlistRepo := repositories.NewPlaylistRepository(dbConn)
+
+	tracks, err := playlistRepo.GetNewReleasesPlaylists()
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"errors": err.Error()})
 	}
